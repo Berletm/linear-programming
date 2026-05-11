@@ -139,13 +139,31 @@ class Polytope:
 
         plt.show()
 
+def solve(figure: Polytope) -> List[Tuple]:
+    res = []
+    j = 0
+    for i in range(0, len(figure.cutted_cones), 2):
+        biorth_basis1 = figure.biorthogonal_cutted_cones[i].vecs
+        biorth_basis2 = figure.biorthogonal_cutted_cones[i+1].vecs
+        f_biorth1 = np.array(biorth_basis1).T @ f
+        f_biorth2 = np.array(biorth_basis2).T @ f
+        p = points[j]
+        
+        if all([k >= 0 for k in f_biorth1]) or all([k >= 0 for k in f_biorth2]):
+            res.append((p, f_biorth1, f_biorth2, f@p, "MAXIMUM"))
+        elif all([k <= 0 for k in f_biorth1]) or all([k <= 0 for k in f_biorth2]):
+            res.append((p, f_biorth1, f_biorth2, f@p, "MINIMUM"))
+        j += 1
+
+    return res
+
 def main() -> None:
     w = Polytope()
 
     w.draw()
 
-
-
+    r = solve(w)
+    print("\n".join([f"{k}" for k in r]))
 
 if __name__ == "__main__":
     main()
